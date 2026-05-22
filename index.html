@@ -97,14 +97,21 @@
     }
     .glow-text { text-shadow: 0 0 20px var(--glow-magenta), 0 0 60px rgba(139,47,201,0.4); }
 
-    /* TITLES & BUTTONS */
+    /* TITLES & ADVANCED BUTTONS */
     .section-title { font-family: var(--font-display); font-size: clamp(2rem, 9vw, 4rem); text-align: center; margin-bottom: 20px; }
     .btn-primary {
+      position: relative; overflow: hidden;
       display: inline-flex; align-items: center; gap: 10px; padding: 15px 38px; border-radius: 50px;
       background: linear-gradient(135deg, var(--purple), var(--magenta)); border: none; color: #fff;
-      font-size: 1rem; font-weight: 600; cursor: pointer; box-shadow: 0 0 30px var(--glow-purple); transition: all 0.2s ease;
+      font-size: 1rem; font-weight: 600; cursor: pointer; box-shadow: 0 0 30px var(--glow-purple); transition: all 0.3s ease;
     }
-    .btn-primary:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 0 40px var(--glow-purple); }
+    .btn-primary::after {
+      content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+      transform: rotate(45deg) translateX(-150%); transition: transform 0.6s ease;
+    }
+    .btn-primary:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 0 45px var(--glow-magenta); }
+    .btn-primary:hover::after { transform: rotate(45deg) translateX(150%); }
 
     /* SCREEN 1 */
     #screen-1 { gap: 32px; }
@@ -168,7 +175,11 @@
       font-size: 1.15rem; line-height: 1.6; font-weight: 500; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.3); text-align: center;
     }
 
-    /* SCREEN 6 — POP THE BALLOON (NEW!) */
+    /* SCREEN 6 — LOVE DESTINY HOROSCOPE (NEW!) */
+    #destiny-scanner-box { position: relative; width: 100px; height: 100px; margin: 20px auto; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px dashed var(--magenta); }
+    .destiny-scan-line { position: absolute; width: 100%; height: 3px; background: var(--pink); box-shadow: 0 0 10px var(--pink); top: 0; animation: scanMove 1s infinite ease-in-out; }
+
+    /* SCREEN 7 — POP THE BALLOON */
     .balloon-container { position: relative; width: 100%; height: 250px; display: flex; justify-content: center; gap: 20px; margin: 20px 0; }
     .balloon {
       width: 60px; height: 75px; background: radial-gradient(circle at 30% 30%, #f472b6, #d946ef);
@@ -194,7 +205,9 @@
     .gift-reveal-box h4 { color: var(--pink); font-size: 0.9rem; margin-bottom: 10px; letter-spacing: 2px; }
     .gift-reveal-box h2 { font-size: 1.4rem; color: #fff; text-shadow: 0 0 15px var(--glow-magenta); line-height: 1.4; }
 
-    /* SCREEN 7 — ENVELOPE & FINAL MESSAGE */
+    /* SCREEN 8 — ENVELOPE & FINAL MESSAGE */
+    #screen-8 { z-index: 10; } /* Text needs to sit above starry canvas */
+    #starry-canvas { position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0; transition: opacity 2s ease; }
     .envelope-wrapper { position: relative; cursor: pointer; text-align: center; z-index: 20; padding: 20px; transition: all 0.5s; }
     .envelope { width: 260px; height: 170px; background: #4a156e; border-radius: 8px; position: relative; display: inline-block; box-shadow: 0 15px 40px rgba(139,47,201,0.5); }
     .flap { position: absolute; top: 0; left: 0; border-left: 130px solid transparent; border-right: 130px solid transparent; border-top: 90px solid #7d26b8; transform-origin: top; transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1); z-index: 5; }
@@ -204,7 +217,7 @@
     .envelope.open .flap { transform: rotateX(180deg); z-index: 3; }
     @keyframes pulse-env { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(1.15); } }
 
-    .message-wrap { width: 100%; max-width: 500px; padding: 28px 24px; border-radius: 20px; display: none; }
+    .message-wrap { width: 100%; max-width: 500px; padding: 28px 24px; border-radius: 20px; display: none; position: relative; z-index: 10; }
     .typewriter-text { font-size: 0.95rem; font-weight: 300; line-height: 1.85; min-height: 200px; }
     .cursor { display: inline-block; width: 2px; height: 1.1em; background: var(--magenta); animation: blink 0.85s infinite; }
     @keyframes blink { 50% { opacity: 0; } }
@@ -212,9 +225,9 @@
     /* FLOATING BUBBLES & MUSIC */
     .love-bubble { position: fixed; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 150; font-size: 1.3rem; pointer-events: auto; }
     .bubble-msg { position: fixed; z-index: 160; color: #fff; font-weight: 600; font-size: 0.85rem; pointer-events: none; transform: translateX(-50%); text-align: center; background: linear-gradient(135deg, var(--purple), var(--magenta)); padding: 6px 14px; border-radius: 20px; box-shadow: 0 0 15px var(--glow-magenta); white-space: nowrap; }
-    #music-btn { position: fixed; bottom: 24px; left: 20px; z-index: 200; width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--purple), var(--magenta)); border: none; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; transition: opacity 0.3s; }
+    #music-btn { position: fixed; bottom: 24px; left: 20px; z-index: 200; width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--purple), var(--magenta)); border: none; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; transition: opacity 0.3s; box-shadow: 0 0 20px var(--glow-magenta); }
     #music-btn.visible { opacity: 1; }
-    .float-hearts { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+    .float-hearts { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 5; }
     .fh { position: absolute; animation: floatUp linear infinite; opacity: 0; }
     @keyframes floatUp { 0% { transform: translateY(100%) scale(0.5); opacity: 0; } 50% { opacity: 0.6; } 100% { transform: translateY(-120%) scale(1); opacity: 0; } }
   </style>
@@ -249,6 +262,7 @@
   <div class="nav-dot" data-screen="5"></div>
   <div class="nav-dot" data-screen="6"></div>
   <div class="nav-dot" data-screen="7"></div>
+  <div class="nav-dot" data-screen="8"></div>
 </nav>
 
 <button id="music-btn" aria-label="Toggle music"><i class="fas fa-music"></i></button>
@@ -256,6 +270,7 @@
 
 <div id="app">
 
+  <!-- SCREEN 1: LANDING -->
   <section class="screen" id="screen-1">
     <div class="landing-badge">✦ March 25 → Forever ✦</div>
     <h1 class="landing-title glow-text" id="landing-title">Happy 2nd Month<br /><span class="highlight">Chuti 💜</span></h1>
@@ -271,6 +286,7 @@
     </button>
   </section>
 
+  <!-- SCREEN 2: TIMELINE -->
   <section class="screen" id="screen-2">
     <div class="section-header">
       <p style="font-size:0.75rem; color:var(--magenta); letter-spacing:0.2em; text-transform:uppercase;">✦ Our Journey ✦</p>
@@ -303,6 +319,7 @@
     </button>
   </section>
 
+  <!-- SCREEN 3: GALLERY -->
   <section class="screen" id="screen-3">
     <div class="section-header">
       <p style="font-size:0.75rem; color:var(--magenta); letter-spacing:0.2em; text-transform:uppercase;">✦ Our Memories ✦</p>
@@ -326,6 +343,7 @@
     </button>
   </section>
 
+  <!-- SCREEN 4: VERIFICATION -->
   <section class="screen" id="screen-4">
     <div class="section-header">
       <p style="font-size:0.75rem; color:var(--magenta); letter-spacing:0.2em; text-transform:uppercase;">✦ Verification ✦</p>
@@ -347,6 +365,7 @@
     </button>
   </section>
 
+  <!-- SCREEN 5: MAGIC BALL -->
   <section class="screen" id="screen-5">
     <div class="section-header" style="margin-bottom: 20px;">
       <p style="font-size:0.75rem; color:var(--magenta); letter-spacing:0.2em; text-transform:uppercase;">✦ Magic ✦</p>
@@ -363,11 +382,39 @@
     </div>
     
     <button class="btn-primary" style="margin-top: 35px;" onclick="goTo(6)">
+      <span>Check Our Destiny</span> <i class="fas fa-star"></i>
+    </button>
+  </section>
+
+  <!-- SCREEN 6: LOVE HOROSCOPE / DESTINY (NEW) -->
+  <section class="screen" id="screen-6">
+    <div class="section-header" style="margin-bottom: 10px;">
+      <p style="font-size:0.75rem; color:var(--magenta); letter-spacing:0.2em; text-transform:uppercase;">✦ Destiny ✦</p>
+      <h2 class="section-title glow-text">Love Horoscope 🔮</h2>
+      <p style="color:var(--text-muted); font-size:0.9rem; margin-top:5px; text-align:center;">මැණිකෙගෙ නම දීලා අපේ ආදරේ අනාගතය බලමුද?</p>
+    </div>
+
+    <div class="glass" style="padding: 30px 20px; text-align: center; max-width: 380px; width: 100%; margin-top: 10px;">
+      <input type="text" id="destiny-name" class="lock-input" placeholder="Type 'Bhagya' / 'Chuti Manike'" style="margin-bottom: 15px;">
+      <button class="btn-primary" id="btn-destiny" style="width:100%; justify-content:center;">
+        <span>Check Love Destiny</span> <i class="fas fa-heartbeat"></i>
+      </button>
+
+      <div id="destiny-scanner-box" style="display:none;">
+         <i class="fas fa-heart" style="font-size:3rem; color:var(--magenta); animation: pulse-scan 1s infinite;"></i>
+         <div class="destiny-scan-line"></div>
+      </div>
+
+      <div id="destiny-result" style="display:none; margin-top:25px; font-size:1.15rem; color:var(--pink); font-weight:600; line-height: 1.5; text-shadow: 0 0 10px var(--glow-magenta);"></div>
+    </div>
+
+    <button class="btn-primary" id="btn-after-destiny" style="margin-top: 25px; display:none; opacity:0;" onclick="goTo(7)">
       <span>Reveal My Gift</span> <i class="fas fa-gift"></i>
     </button>
   </section>
 
-  <section class="screen" id="screen-6">
+  <!-- SCREEN 7: POP BALLOON -->
+  <section class="screen" id="screen-7">
     <div class="section-header" style="margin-bottom: 10px;">
       <p style="font-size:0.75rem; color:var(--magenta); letter-spacing:0.2em; text-transform:uppercase;">✦ Surprise ✦</p>
       <h2 class="section-title glow-text">Pop a Balloon! 🎈</h2>
@@ -386,12 +433,14 @@
       <h2 id="gift-text">Loading...</h2>
     </div>
 
-    <button class="btn-primary" id="btn-after-balloon" style="margin-top: 30px; display:none; opacity:0;" onclick="goTo(7)">
+    <button class="btn-primary" id="btn-after-balloon" style="margin-top: 30px; display:none; opacity:0;" onclick="goTo(8)">
       <span>Read Secret Message</span> <i class="fas fa-envelope-open-text"></i>
     </button>
   </section>
 
-  <section class="screen" id="screen-7">
+  <!-- SCREEN 8: ENVELOPE & FINAL MESSAGE + FIREWORKS -->
+  <section class="screen" id="screen-8">
+    <canvas id="starry-canvas"></canvas>
     <div id="float-hearts" class="float-hearts"></div>
     
     <div id="envelope-wrap" class="envelope-wrapper">
@@ -408,7 +457,7 @@
       <h2 class="msg-header glow-text" style="font-family:var(--font-display); font-size:2.5rem; text-align:center; margin-bottom:15px;">Secret Message 💜</h2>
       <div class="typewriter-text" id="typewriter"><span class="cursor"></span></div>
       <div class="msg-footer" style="margin-top:20px; text-align:center; font-style:italic; font-size:0.85rem; color:var(--text-muted);">
-        <i class="fas fa-heart" style="color:var(--magenta)"></i> With all my love, always & forever <i class="fas fa-heart" style="color:var(--magenta)"></i>
+        <i class="fas fa-heart" style="color:var(--magenta)"></i> With all my love, Udara & Bhagya <i class="fas fa-heart" style="color:var(--magenta)"></i>
       </div>
       
       <div style="text-align: center; margin-top: 35px; z-index: 10; position: relative;">
@@ -506,13 +555,13 @@ function goTo(n) {
   gsap.to(prev, { opacity: 0, y: dir * -40, duration: 0.4, ease: 'power2.in', onComplete: () => {
       prev.classList.remove('active'); next.classList.add('active');
       
-      if (n === 7) {
+      if (n === 8) {
          document.getElementById('envelope-wrap').style.display = 'block'; document.getElementById('envelope-wrap').style.opacity = '1';
          document.querySelector('.envelope').classList.remove('open'); document.getElementById('message-wrap-actual').style.display = 'none';
+         document.getElementById('starry-canvas').style.opacity = '0';
       }
       
-      // Reset Balloon state if revisiting screen 6
-      if (n === 6) {
+      if (n === 7) {
         document.getElementById('balloon-container').style.display = 'flex';
         document.getElementById('gift-reveal-box').style.display = 'none';
         document.getElementById('btn-after-balloon').style.display = 'none';
@@ -577,32 +626,55 @@ document.getElementById('magic-ball-btn').addEventListener('click', () => {
   }
 });
 
-/* --- POP THE BALLOON (REPLACES SCRATCH CARD) --- */
+/* --- LOVE HOROSCOPE (DESTINY) --- */
+const destinyQuotes = [
+  "අපේ ආදරේ කවදාවත් නොමැකෙන තාරකාවක් වගේ! ✨",
+  "භාග්‍යා, ඔයාගේ ආදරේ තමයි මගේ ජීවිතේ හුස්ම... 💜",
+  "මේ සංසාරේ පුරාවටම ඔයා මගේ විතරමයි මැණිකේ! 🥰",
+  "මගේ හදවතේ එකම රිද්මය ඔයා තමයි චූටි... 💓",
+  "අපේ කතාව මේ ලෝකෙ තියෙන ලස්සනම ආදර කතාවයි! 📖",
+  "උදාරගේ මුළු ලෝකයම වෙන්නේ භාග්‍යාගේ ආදරේ විතරයි... 🌸"
+];
+document.getElementById('btn-destiny').addEventListener('click', () => {
+  const name = document.getElementById('destiny-name').value.trim();
+  if(!name) { alert("Please enter your name!"); return; }
+  
+  document.getElementById('btn-destiny').style.display = 'none';
+  document.getElementById('destiny-scanner-box').style.display = 'flex';
+  
+  setTimeout(() => {
+    document.getElementById('destiny-scanner-box').style.display = 'none';
+    const resultBox = document.getElementById('destiny-result');
+    resultBox.innerText = destinyQuotes[Math.floor(Math.random() * destinyQuotes.length)];
+    resultBox.style.display = 'block';
+    gsap.fromTo(resultBox, {scale: 0.5, opacity: 0}, {scale: 1, opacity: 1, duration: 0.6, ease: 'back.out(1.5)'});
+    
+    const nextBtn = document.getElementById('btn-after-destiny');
+    nextBtn.style.display = 'inline-flex';
+    gsap.to(nextBtn, {opacity: 1, duration: 0.5, delay: 0.5});
+    confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+  }, 2500);
+});
+
+/* --- POP THE BALLOON --- */
 const gifts = [ "Romantic Movie Night 🎬", "An Unforgettable Dayout 🚗", "Grand Birthday Party 🎂", "Visit to a Beautiful Park 🌳", "Romantic Beach Walk 🏖️", "Your Favorite Food Treat 🍕" ];
 
 function popBalloon(element) {
-  // Set random gift text
   document.getElementById('gift-text').innerText = gifts[Math.floor(Math.random() * gifts.length)];
-  
-  // Confetti explosion exactly at balloon location
   const rect = element.getBoundingClientRect();
   const x = (rect.left + rect.width / 2) / window.innerWidth;
   const y = (rect.top + rect.height / 2) / window.innerHeight;
   confetti({ particleCount: 60, spread: 70, origin: { x: x, y: y }, colors: ['#d946ef', '#bf5df0', '#f472b6'] });
 
-  // Pop animation for the clicked balloon
   gsap.to(element, { scale: 1.5, opacity: 0, duration: 0.2, onComplete: () => {
-    // Hide balloon container
     gsap.to('#balloon-container', { opacity: 0, duration: 0.3, onComplete: () => {
       document.getElementById('balloon-container').style.display = 'none';
-      document.getElementById('balloon-container').style.opacity = 1; // reset for later
+      document.getElementById('balloon-container').style.opacity = 1; 
       
-      // Reveal the gift box
       const revealBox = document.getElementById('gift-reveal-box');
       revealBox.style.display = 'block';
       gsap.fromTo(revealBox, {scale: 0.5, opacity: 0}, {scale: 1, opacity: 1, duration: 0.5, ease: 'back.out(1.5)'});
       
-      // Show Next button
       const btn = document.getElementById('btn-after-balloon');
       btn.style.display = 'inline-flex';
       gsap.to(btn, {opacity: 1, duration: 0.5, delay: 0.5});
@@ -616,12 +688,12 @@ document.getElementById('envelope-wrap').addEventListener('click', function() {
   const envWrap = this; const envelope = document.querySelector('.envelope'); const msgWrap = document.getElementById('message-wrap-actual');
   envelope.classList.add('open');
   setTimeout(() => {
-     gsap.to(envWrap, { opacity: 0, y: 50, scale: 0.8, duration: 0.6, ease: 'power2.in', onComplete: () => {
+      gsap.to(envWrap, { opacity: 0, y: 50, scale: 0.8, duration: 0.6, ease: 'power2.in', onComplete: () => {
           envWrap.style.display = 'none'; msgWrap.style.display = 'block';
           gsap.fromTo(msgWrap, {opacity: 0, y: 30, scale: 0.95}, {opacity: 1, y: 0, scale: 1, duration: 0.6, ease: 'back.out(1.5)'});
           startTypewriter();
        }
-     });
+      });
   }, 800);
 });
 
@@ -656,32 +728,102 @@ function triggerLandingAnimations() { gsap.timeline().from('.landing-badge', { o
 function animateTimeline() { document.querySelectorAll('.tl-item').forEach((item, i) => { setTimeout(() => item.classList.add('visible'), i * 150); }); }
 new Swiper('.mySwiper', { effect: 'coverflow', grabCursor: true, centeredSlides: true, slidesPerView: 'auto', loop: true, speed: 1000, autoplay: { delay: 2500, disableOnInteraction: false }, coverflowEffect: { rotate: 35, stretch: 0, depth: 100, modifier: 1, slideShadows: true }, pagination: { el: '.swiper-pagination', clickable: true } });
 
-/* --- TYPEWRITER & FIREWORKS --- */
+/* --- TYPEWRITER & ADVANCED FIREWORKS --- */
 function startTypewriter() {
   document.getElementById('typewriter').innerHTML = '<span class="cursor"></span>';
   const msg = `මගේ චූටි මැණිකේ... අදට අපි ආදරෙයි කියලා හරියටම මාස 2යි. අහම්බෙන් මුණගැහිලා, මගේ ජීවිතේට ආපු ඔයා, අද වෙද්දි මගේ මුළු ලෝකයම වෙලා ඉවරයි. හැමදාම රෑට පැය ගණන් ඔයා එක්ක Call එකෙන් කතා කරන එක දැන් මගේ ජීවිතේ ලොකුම පුරුද්දක් වෙලා චූටි 🥺. ඇස් දෙකෙන් දකින්නත් කලින් ඔයාට බැඳුණු මේ හිත, මැයි 3 වෙනිදා ඔයාව හැබෑවටම දැක්ක දවසේ තවත් පිස්සු වැටුණා. ඒක අපේ ජීවිතේ ලස්සනම දවස. මට විශ්වාසයි චූටි... කවදාහරි අපි දෙන්නා අනිවාර්යයෙන්ම විවාහ වෙලා, අපේ හැම අනාගත හීනයක්ම ජයගෙන මුළු ජීවිත කාලෙම ගොඩක් සතුටින් එකට ඉන්නවා. මං ඔයාට ගොඩක් ආදරෙයි මගේ චූටි මැණිකේ! 💜`;
   const el = document.getElementById('typewriter'), cursor = el.querySelector('.cursor'); let i = 0;
+  
+  // Speed slightly increased here (Math.random() * 25 + 15 vs old 50+30)
   function type() {
-    if (i < msg.length && currentScreen === 7) { 
-      el.insertBefore(document.createTextNode(msg[i++]), cursor); setTimeout(type, Math.random() * 50 + 30); 
-    } else if (i >= msg.length) { setTimeout(triggerFireworks, 500); }
+    if (i < msg.length && currentScreen === 8) { 
+      el.insertBefore(document.createTextNode(msg[i++]), cursor); setTimeout(type, Math.random() * 25 + 15); 
+    } else if (i >= msg.length) { setTimeout(triggerStarryInitials, 800); }
   }
   setTimeout(type, 500); spawnFloatingHearts();
 }
 
-function triggerFireworks() {
-  const duration = 3 * 1000; const end = Date.now() + duration;
-  (function frame() {
-    confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#d946ef', '#bf5df0', '#f472b6', '#ffffff'] });
-    confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#d946ef', '#bf5df0', '#f472b6', '#ffffff'] });
-    if (Date.now() < end && currentScreen === 7) requestAnimationFrame(frame);
-  }());
+function triggerStarryInitials() {
+  const canvas = document.getElementById('starry-canvas');
+  canvas.style.opacity = '1';
+  const ctx = canvas.getContext('2d');
+  let w = canvas.width = window.innerWidth;
+  let h = canvas.height = window.innerHeight;
+
+  // Draw U ♥ B on offscreen canvas to get particle coordinates
+  const osCanvas = document.createElement('canvas');
+  const osCtx = osCanvas.getContext('2d');
+  osCanvas.width = w; osCanvas.height = h;
+  osCtx.font = "bold " + Math.min(w/3.5, 120) + "px Arial";
+  osCtx.fillStyle = "white";
+  osCtx.textAlign = "center";
+  osCtx.textBaseline = "middle";
+  osCtx.fillText("U ♥ B", w/2, h/2 - 80);
+
+  const data = osCtx.getImageData(0,0,w,h).data;
+  let targetPoints = [];
+  for(let y=0; y<h; y+=7){
+      for(let x=0; x<w; x+=7){
+          if(data[(y*w + x)*4 + 3] > 128){ targetPoints.push({x, y}); }
+      }
+  }
+
+  let particles = [];
+  targetPoints.forEach(pt => {
+      particles.push({
+          x: w/2, y: h/2,
+          tx: pt.x, ty: pt.y,
+          speed: Math.random() * 0.03 + 0.015,
+          color: ['#d946ef', '#bf5df0', '#f472b6', '#ffffff'][Math.floor(Math.random()*4)],
+          size: Math.random() * 2.5 + 1,
+          progress: 0,
+          delay: Math.random() * 50
+      });
+  });
+
+  // Background Stars
+  let stars = [];
+  for(let i=0; i<150; i++) { stars.push({x: Math.random()*w, y: Math.random()*h, r: Math.random()*1.5, o: Math.random()}); }
+
+  let frameCount = 0;
+  function render(){
+      if (currentScreen !== 8) return;
+      ctx.fillStyle = "rgba(5, 5, 8, 0.25)";
+      ctx.fillRect(0,0,w,h);
+      
+      // Draw stars
+      stars.forEach(s => {
+         s.o += (Math.random()-0.5)*0.1;
+         if(s.o < 0) s.o = 0; if(s.o > 1) s.o = 1;
+         ctx.fillStyle = `rgba(255,255,255,${s.o})`;
+         ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill();
+      });
+
+      frameCount++;
+      particles.forEach(p => {
+          if (frameCount < p.delay) return;
+          p.progress += p.speed;
+          let cx = p.x + (p.tx - p.x) * Math.min(p.progress, 1);
+          let cy = p.y + (p.ty - p.y) * Math.min(p.progress, 1);
+          
+          if(p.progress >= 1) {
+              cx = p.tx + (Math.random()-0.5)*3;
+              cy = p.ty + (Math.random()-0.5)*3;
+              ctx.shadowBlur = 15; ctx.shadowColor = p.color;
+          } else { ctx.shadowBlur = 0; }
+          
+          ctx.fillStyle = p.color;
+          ctx.beginPath(); ctx.arc(cx, cy, p.size, 0, Math.PI*2); ctx.fill();
+      });
+      requestAnimationFrame(render);
+  }
+  render();
 }
 
 function spawnFloatingHearts() {
   const container = document.getElementById('float-hearts'), emojis = ['💜','✨','🌸','💝'];
   const interval = setInterval(() => {
-    if(currentScreen !== 7) { clearInterval(interval); return; }
+    if(currentScreen !== 8) { clearInterval(interval); return; }
     const h = document.createElement('span'); h.classList.add('fh'); h.textContent = emojis[Math.floor(Math.random() * emojis.length)];
     h.style.left = Math.random() * 100 + '%'; h.style.bottom = '-10%'; h.style.fontSize = (Math.random() * 12 + 12) + 'px';
     h.style.animationDuration = (Math.random() * 4 + 4) + 's'; container.appendChild(h); setTimeout(() => h.remove(), 6000);
