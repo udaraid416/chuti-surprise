@@ -183,35 +183,39 @@
     }
     .landing-subtitle { font-size: 0.9rem; color: var(--text-muted); text-align: center; max-width: 340px; margin-bottom: 10px; }
 
-    /* UPDATE: Mobile Responsive Counter Fix */
+    /* UPDATE: PERFECT MOBILE GRID FIX FOR COUNTER */
     .counter-row { 
-      display: flex; 
-      gap: clamp(6px, 1.5vw, 12px); 
-      justify-content: center; 
-      width: 100%; 
-      max-width: 400px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr)); /* Force equal 4 columns */
+      gap: 6px; /* Small gap for phones */
+      width: 100%;
+      max-width: 380px; 
+      margin: 0 auto;
     }
     .counter-card { 
-      padding: 12px clamp(4px, 2vw, 20px); 
-      border-radius: 14px; 
-      text-align: center; 
-      flex: 1 1 0; 
-      min-width: 0; 
+      padding: 12px 2px; /* Very small horizontal padding to fit */
+      border-radius: 12px; 
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
     .counter-num {
-      font-size: clamp(1.2rem, 5vw, 2rem); 
+      font-size: clamp(1.1rem, 4.5vw, 1.8rem); 
       font-weight: 700;
       background: linear-gradient(135deg, var(--purple-light), var(--magenta));
       -webkit-background-clip: text; 
       -webkit-text-fill-color: transparent; 
       background-clip: text;
-      display: block;
+      line-height: 1.2;
     }
     .counter-label { 
-      font-size: clamp(0.5rem, 2vw, 0.6rem); 
-      letter-spacing: 0.1em; 
+      font-size: clamp(0.45rem, 2vw, 0.6rem); 
+      letter-spacing: 0.05em; 
       text-transform: uppercase; 
       color: var(--text-muted); 
+      margin-top: 2px;
     }
 
     .btn-primary {
@@ -530,7 +534,6 @@ function goTo(n) {
   if (n === currentScreen || isAnimating) return;
   isAnimating = true;
 
-  // Trigger the new heart rain transition!
   heartBurstTransition();
 
   const prev = document.getElementById(`screen-${currentScreen}`);
@@ -594,7 +597,7 @@ document.addEventListener('wheel', e => {
     this.size = Math.random() * 12 + 10; 
     this.speed = Math.random() * 1.5 + 0.5;
     this.angle = Math.random() * 360;
-    this.spin = (Math.random() - 0.5) * 3; // Spin speed for 3D flip effect
+    this.spin = (Math.random() - 0.5) * 3; 
   }
   Particle.prototype.update = function() { 
     this.y += this.speed; 
@@ -607,19 +610,15 @@ document.addEventListener('wheel', e => {
   Particle.prototype.draw = function() {
     ctx.save(); 
     ctx.translate(this.x, this.y);
-    
-    // Simulate 3D Flip using scale
     let scaleX = Math.sin(this.angle * Math.PI / 180);
     ctx.scale(scaleX, 1);
-    
     ctx.font = this.size + 'px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.shadowColor = 'rgba(217, 70, 239, 0.6)'; // Glow effect
+    ctx.shadowColor = 'rgba(217, 70, 239, 0.6)'; 
     ctx.shadowBlur = 8;
     ctx.globalAlpha = 0.6;
     ctx.fillText('💜', 0, 0); 
-    
     ctx.restore();
   };
   for(let i=0; i<40; i++) particles.push(new Particle());
