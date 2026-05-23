@@ -34,9 +34,21 @@
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    /* FEATURE 1: BREATHING GRADIENT BACKGROUND */
+    @keyframes breathingGradient {
+      0%   { background-position: 0% 50%; }
+      25%  { background-position: 50% 0%; }
+      50%  { background-position: 100% 50%; }
+      75%  { background-position: 50% 100%; }
+      100% { background-position: 0% 50%; }
+    }
+
     html, body {
       width: 100%; height: 100%;
-      background: var(--bg); color: var(--text); font-family: var(--font-body);
+      background: linear-gradient(135deg, #050508, #1a0526, #0a0a2a, #050508, #12032a, #0a0a2a);
+      background-size: 400% 400%;
+      animation: breathingGradient 18s ease infinite;
+      color: var(--text); font-family: var(--font-body);
       overflow: hidden; -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased;
     }
 
@@ -380,8 +392,54 @@
     /* FLOATING BUBBLES & MUSIC */
     .love-bubble { position: fixed; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 150; font-size: 1.3rem; pointer-events: auto; }
     .bubble-msg { position: fixed; z-index: 160; color: #fff; font-weight: 600; font-size: 0.85rem; pointer-events: none; transform: translateX(-50%); text-align: center; background: linear-gradient(135deg, var(--purple), var(--magenta)); padding: 6px 14px; border-radius: 20px; box-shadow: 0 0 15px var(--glow-magenta); white-space: nowrap; }
+    /* FEATURE 3: RIPPLE CSS */
+    .ripple-ring {
+      position: fixed;
+      border-radius: 50%;
+      border: 2px solid var(--magenta);
+      pointer-events: none;
+      z-index: 99998;
+      transform: translate(-50%, -50%) scale(0);
+      box-shadow: 0 0 8px var(--glow-magenta), inset 0 0 8px rgba(217,70,239,0.15);
+    }
+
+    /* FEATURE 4: GLOWING MUSIC WAVE RINGS */
     #music-btn { position: fixed; bottom: 24px; left: 20px; z-index: 200; width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--purple), var(--magenta)); border: none; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; transition: opacity 0.3s; box-shadow: 0 0 20px var(--glow-magenta); }
     #music-btn.visible { opacity: 1; }
+
+    /* Wave rings via pseudo-elements + extra sibling divs injected by JS */
+    #music-btn.playing {
+      box-shadow: 0 0 25px var(--glow-magenta), 0 0 50px rgba(217,70,239,0.2);
+    }
+    #music-btn.playing::before,
+    #music-btn.playing::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      border: 2px solid var(--magenta);
+      inset: -2px;
+      animation: musicRipple 2s ease-out infinite;
+    }
+    #music-btn.playing::after {
+      animation-delay: 0.75s;
+    }
+    @keyframes musicRipple {
+      0%   { transform: scale(1);   opacity: 0.7; }
+      100% { transform: scale(2.6); opacity: 0; }
+    }
+    /* Third ring via a sibling span */
+    #music-wave-3 {
+      position: fixed; bottom: 24px; left: 20px;
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      border: 2px solid var(--purple-light);
+      pointer-events: none; z-index: 199;
+      opacity: 0;
+    }
+    #music-wave-3.playing {
+      animation: musicRipple 2s ease-out infinite;
+      animation-delay: 1.4s;
+    }
     .float-hearts { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 5; }
     .fh { position: absolute; animation: floatUp linear infinite; opacity: 0; }
     @keyframes floatUp { 0% { transform: translateY(100%) scale(0.5); opacity: 0; } 50% { opacity: 0.6; } 100% { transform: translateY(-120%) scale(1); opacity: 0; } }
@@ -423,6 +481,7 @@
 </nav>
 
 <button id="music-btn" aria-label="Toggle music"><i class="fas fa-music"></i></button>
+<div id="music-wave-3"></div>
 <audio id="bgm" loop preload="auto"><source src="bgm.mp3" type="audio/mpeg" /></audio>
 
 <div id="app">
@@ -827,6 +886,92 @@ const bgm = document.getElementById('bgm');
 })();
 
 
+/* ================================================================
+   FEATURE 2: MAGIC SPARKLE TRAIL (pointermove / touchmove)
+   ================================================================ */
+(function initSparkleTrail() {
+  let lastSpawnTime = 0;
+  const THROTTLE_MS = 35; // ~28 sparkles/sec max — safe on mobile
+
+  const sparkChars = ['✦', '·', '⋆', '✧', '✨'];
+
+  function spawnSparkle(x, y) {
+    const el = document.createElement('div');
+    el.textContent = sparkChars[Math.floor(Math.random() * sparkChars.length)];
+    el.style.cssText = `
+      position: fixed;
+      left: ${x}px;
+      top: ${y}px;
+      pointer-events: none;
+      z-index: 99997;
+      font-size: ${Math.random() * 8 + 7}px;
+      color: ${Math.random() > 0.5 ? 'var(--magenta)' : 'var(--purple-light)'};
+      filter: drop-shadow(0 0 4px var(--glow-magenta));
+      user-select: none;
+      will-change: transform, opacity;
+    `;
+    document.body.appendChild(el);
+
+    gsap.to(el, {
+      x: (Math.random() - 0.5) * 30,
+      y: Math.random() * 28 + 8,
+      scale: Math.random() * 0.5 + 0.2,
+      opacity: 0,
+      duration: Math.random() * 0.35 + 0.45,
+      ease: 'power2.out',
+      onComplete: () => el.remove()
+    });
+  }
+
+  document.addEventListener('pointermove', (e) => {
+    const now = Date.now();
+    if (now - lastSpawnTime < THROTTLE_MS) return;
+    lastSpawnTime = now;
+    // Use changedTouches if available (touch events)
+    const x = e.clientX;
+    const y = e.clientY;
+    spawnSparkle(x, y);
+    // Spawn a second offset sparkle occasionally for density
+    if (Math.random() > 0.55) {
+      spawnSparkle(x + (Math.random() - 0.5) * 16, y + (Math.random() - 0.5) * 16);
+    }
+  }, { passive: true });
+})();
+
+
+/* ================================================================
+   FEATURE 3: RIPPLE TOUCH EFFECT
+   ================================================================ */
+(function initRipple() {
+  document.addEventListener('pointerdown', (e) => {
+    const ring = document.createElement('div');
+    ring.className = 'ripple-ring';
+    // Size between 40–70px starting circle
+    const size = Math.random() * 30 + 40;
+    ring.style.cssText = `
+      width: ${size}px;
+      height: ${size}px;
+      left: ${e.clientX}px;
+      top: ${e.clientY}px;
+    `;
+    document.body.appendChild(ring);
+
+    gsap.to(ring, {
+      scale: 4.5 + Math.random() * 2,
+      opacity: 0,
+      duration: 0.65,
+      ease: 'power2.out',
+      onComplete: () => ring.remove()
+    });
+  });
+})();
+
+
+/* ================================================================
+   FEATURE 4: MUSIC WAVE helper — toggling .playing on wave-3
+   ================================================================ */
+const musicWave3 = document.getElementById('music-wave-3');
+
 /* --- TOUCH HEART BURST --- */
 document.addEventListener('pointerdown', (e) => {
   if(e.target.closest('button') || e.target.closest('.nav-dot') || e.target.closest('.fingerprint-btn') || e.target.closest('.magic-ball') || e.target.closest('.balloon')) return;
@@ -867,7 +1012,7 @@ setInterval(() => {
 document.getElementById('btn-unlock').addEventListener('click', () => {
   if (document.getElementById('anniversary-date').value === '2026-03-25') {
     document.getElementById('lock-error').style.display = 'none';
-    bgm.play().then(() => { musicBtn.classList.add('playing'); musicBtn.querySelector('i').className = 'fas fa-pause'; playing = true; }).catch(e=>{});
+    bgm.play().then(() => { musicBtn.classList.add('playing'); musicBtn.querySelector('i').className = 'fas fa-pause'; musicWave3.classList.add('playing'); playing = true; }).catch(e=>{});
     gsap.to('#screen-lock', { opacity: 0, scale: 0.95, duration: 0.6, onComplete: () => {
       document.getElementById('screen-lock').classList.remove('active'); document.getElementById('screen-lock').style.display = 'none';
       document.getElementById('screen-1').classList.add('active'); document.getElementById('nav-dots').classList.add('visible');
@@ -1241,7 +1386,20 @@ function spawnFloatingHearts() {
 }
 
 /* --- MUSIC TOGGLE --- */
-musicBtn.addEventListener('click', () => { if (playing) { bgm.pause(); musicBtn.querySelector('i').className = 'fas fa-music'; } else { bgm.play(); musicBtn.querySelector('i').className = 'fas fa-pause'; } playing = !playing; });
+musicBtn.addEventListener('click', () => {
+  if (playing) {
+    bgm.pause();
+    musicBtn.querySelector('i').className = 'fas fa-music';
+    musicBtn.classList.remove('playing');
+    musicWave3.classList.remove('playing');
+  } else {
+    bgm.play();
+    musicBtn.querySelector('i').className = 'fas fa-pause';
+    musicBtn.classList.add('playing');
+    musicWave3.classList.add('playing');
+  }
+  playing = !playing;
+});
 </script>
 </body>
 </html>
